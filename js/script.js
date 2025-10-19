@@ -42,16 +42,81 @@
       }
     });
 
-    // Mostrar/ocultar opções do concurso de fantasia
-    document.getElementById('participarConcurso').addEventListener('change', function() {
-      const concursoDetails = document.getElementById('concursoDetails');
-      if (this.checked) {
-        concursoDetails.classList.remove('hidden');
+    // Hover effect da Ângella Maris com transição/fade e pré-carregamento (fallback se preload falhar)
+    document.addEventListener('DOMContentLoaded', function() {
+      const angella = document.getElementById('angellaImage');
+      if (!angella) return;
+
+      const originalSrc = angella.getAttribute('src');
+      const hoverSrc = angella.getAttribute('data-hover-src');
+
+      // Função utilitária para pré-carregar imagem
+      function preload(src, cb) {
+        const img = new Image();
+        img.onload = () => cb(null, src);
+        img.onerror = (e) => cb(e || new Error('failed to load'));
+        img.src = src;
+      }
+
+      // Se não houver hoverSrc, não faz nada
+      if (!hoverSrc) return;
+
+      // Função que aplica os handlers (usada tanto no sucesso quanto no fallback)
+      function applyHoverHandlers() {
+        angella.style.cursor = 'pointer';
+
+        let isHover = false;
+
+        function swapTo(src) {
+          angella.classList.add('fading');
+          setTimeout(() => {
+            angella.src = src;
+            angella.classList.remove('fading');
+          }, 160);
+        }
+
+        angella.addEventListener('mouseenter', function() {
+          if (isHover) return;
+          isHover = true;
+          swapTo(hoverSrc);
+        });
+
+        angella.addEventListener('mouseleave', function() {
+          if (!isHover) return;
+          isHover = false;
+          swapTo(originalSrc);
+        });
+      }
+
+      // Tentar pré-carregar; mesmo se falhar, aplicamos os handlers (fallback)
+      preload(hoverSrc, function(err) {
+        if (err) console.warn('Imagem de hover não pôde ser pré-carregada, aplicando fallback:', hoverSrc);
+        applyHoverHandlers();
+      });
+    });
+
+    // Detectar mudança de faixa etária e atualizar mensagem do Open Bar
+    document.getElementById('faixa-etaria').addEventListener('change', function() {
+      const faixaEtaria = this.value;
+      const openbarDefault = document.querySelector('.openbar-default');
+      const openbarAdult = document.querySelector('.openbar-adult');
+      const openbarMinor = document.querySelector('.openbar-minor');
+      
+      if (faixaEtaria === 'maior') {
+        // Maior de 18 - mostrar mensagem especial com bebidas alcoólicas
+        openbarDefault.classList.add('hidden');
+        openbarMinor.classList.add('hidden');
+        openbarAdult.classList.remove('hidden');
+      } else if (faixaEtaria === 'menor') {
+        // Menor de 18 - mostrar mensagem apenas com bebidas não alcoólicas
+        openbarDefault.classList.add('hidden');
+        openbarAdult.classList.add('hidden');
+        openbarMinor.classList.remove('hidden');
       } else {
-        concursoDetails.classList.add('hidden');
-        // Resetar campos do concurso
-        document.getElementById('contest-tipo-main').value = '';
-        document.getElementById('contest-idade-main').value = '';
+        // Nenhuma selecionada - mostrar mensagem padrão
+        openbarAdult.classList.add('hidden');
+        openbarMinor.classList.add('hidden');
+        openbarDefault.classList.remove('hidden');
       }
     });
 
@@ -64,9 +129,17 @@
         nome: document.getElementById('nome').value,
         telefone: document.getElementById('telefone').value,
         acompanhantes: document.getElementById('acompanhantes').value,
+        tipoParticipante: document.getElementById('tipo-participante').value,
+        faixaEtaria: document.getElementById('faixa-etaria').value,
         querCamisa: document.getElementById('querCamisa').checked,
         participarConcurso: document.getElementById('participarConcurso').checked
       };
+
+      // Validar campos obrigatórios de elegibilidade
+      if (!formData.tipoParticipante || !formData.faixaEtaria) {
+        alert('Por favor, preencha se você é aluno ou visitante e sua faixa etária!');
+        return;
+      }
 
       // Se quer camisa, coletar o tamanho e quantidade
       if (formData.querCamisa) {
@@ -79,26 +152,14 @@
         formData.quantidadeCamisas = document.getElementById('quantidadeCamisas').value;
       }
 
-      // Se vai participar do concurso, coletar dados do concurso
+      // Se vai participar do concurso, armazenar no localStorage para votação
       if (formData.participarConcurso) {
-        const contestTipo = document.getElementById('contest-tipo-main').value;
-        const contestIdade = document.getElementById('contest-idade-main').value;
-        
-        if (!contestTipo || !contestIdade) {
-          alert('Por favor, preencha os dados obrigatórios do concurso de fantasia!');
-          return;
-        }
-        
-        formData.contestTipo = contestTipo;
-        formData.contestIdade = contestIdade;
-
-        // Armazenar no localStorage também para o sistema de votação
         const contestParticipant = {
           id: Date.now(),
           nome: formData.nome,
           telefone: formData.telefone,
-          tipo: formData.contestTipo,
-          idade: formData.contestIdade,
+          tipo: formData.tipoParticipante,
+          idade: formData.faixaEtaria,
           votos: 0,
           dataRegistro: new Date().toISOString()
         };
@@ -122,29 +183,49 @@
         mensagem += `📱 *WhatsApp:* ${formData.telefone}\n`;
         mensagem += `👥 *Acompanhantes:* ${formData.acompanhantes}\n\n`;
         
+        // Informações de elegibilidade
+        mensagem += `🏫 *Você é:* ${formData.tipoParticipante === 'aluno' ? '👨‍🎓 Aluno da Infinity School' : '👥 Visitante'}\n`;
+        mensagem += `🎂 *Faixa Etária:* ${formData.faixaEtaria === 'menor' ? '🧒 Menor de idade' : '🧑‍💼 Maior de idade'}\n\n`;
+        
         // Informações da blusa
         if (formData.querCamisa) {
           mensagem += `👕 *BLUSA OFICIAL:* Sim ✅\n`;
           mensagem += `📏 *Tamanho:* ${formData.tamanho}\n`;
           mensagem += `🔢 *Quantidade:* ${formData.quantidadeCamisas}\n\n`;
         } else {
-          mensagem += `� *Blusa Oficial:* Não\n\n`;
+          mensagem += `👕 *Blusa Oficial:* Não\n\n`;
         }
 
         // Informações do concurso
         if (formData.participarConcurso) {
           mensagem += `🏆 *CONCURSO DE FANTASIA:* Sim ✅\n`;
-          mensagem += `🏫 *Tipo:* ${formData.contestTipo === 'aluno' ? 'Aluno da Infinity School' : 'Visitante'}\n`;
-          mensagem += `🎂 *Idade:* ${formData.contestIdade === 'menor' ? 'Menor de idade' : 'Maior de idade'}\n\n`;
+          mensagem += `� *Cadastrado para concorrer aos prêmios!*\n\n`;
         } else {
           mensagem += `🏆 *Concurso de Fantasia:* Não\n\n`;
         }
 
         // Informações do evento
-        mensagem += `🎃 *CONFIRMAÇÃO DE PRESENÇA*\n`;
-        mensagem += `📍 *Data:* 25 de Outubro de 2025\n`;
-        mensagem += `🕔 *Horário:* 17:00\n`;
-        mensagem += `📍 *Local:* Av. do Contorno, 6480 - Savassi, BH\n\n`;
+        mensagem += `🎉 *DESTAQUES DO EVENTO:*\n`;
+        
+        // Open Bar - mensagem personalizada baseada na idade
+        if (formData.faixaEtaria === 'maior') {
+          mensagem += `🍹 *OPEN BAR COMPLETO* - Bebidas alcoólicas e não alcoólicas liberadas! 🍻\n`;
+        } else if (formData.faixaEtaria === 'menor') {
+          mensagem += `🧃 *OPEN BAR* - Sucos, refrigerantes e bebidas não alcoólicas liberadas!\n`;
+        } else {
+          mensagem += `🍹 *OPEN BAR* - Bebidas liberadas durante todo o evento!\n`;
+        }
+        
+        mensagem += `🎤 *Palestras Técnicas* com profissionais da área de tecnologia\n`;
+        mensagem += `🎭 *Experiências únicas* - Música, arte, networking e muito mais!\n`;
+        mensagem += `🎃 *Decoração temática* e ambiente imersivo de Halloween\n`;
+        mensagem += `📸 *Fotografia profissional* para registrar seu momento\n\n`;
+        
+        mensagem += `📍 *DATA E LOCAL:*\n`;
+        mensagem += `📅 25 de Outubro de 2025\n`;
+        mensagem += `🕔 17:00\n`;
+        mensagem += `📍 Av. do Contorno, 6480 - Savassi, BH\n`;
+        mensagem += `🏢 Infinity School Savassi\n\n`;
         
         // Tipo de inscrição
         if (formData.querCamisa && formData.participarConcurso) {
@@ -770,6 +851,38 @@
         description: 'Registros dos momentos mais marcantes da noite, com toda a atmosfera mágica e assombrada que tornou o evento inesquecível.'
       }
     ];
+
+    // Array para os designs de tatuagem (mesma ordem das miniaturas no carousel)
+    const tattooDesigns = [
+      { src: 'ghost.png', title: '👻 Fantasma Assustador', description: 'Design clássico de Halloween com um toque moderno.' },
+      { src: 'skull.png', title: '💀 Caveira Sombria', description: 'A marca eterna do Halloween em sua pele.' },
+      { src: 'bat.png', title: '🦇 Morcego Noturno', description: 'Símbolo da noite e do mistério.' },
+      { src: 'pumpkin.png', title: "🎃 Jack O'Lantern", description: 'O clássico símbolo do Halloween.' },
+      { src: 'spider.png', title: '🕷️ Aranha Macabra', description: 'Terror em oito pernas.' },
+      { src: 'heart.png', title: '😈 Coração Diabólico', description: 'O amor tem seu lado sombrio.' }
+    ];
+
+    // Função para abrir modal de tatuagem usando o modal de imagem existente
+    function openTattooModal(index) {
+      const data = tattooDesigns[index];
+      if (!data) return;
+      const modalImg = document.getElementById('modalImage');
+      const titleEl = document.getElementById('imageTitle');
+      const descEl = document.getElementById('imageDescription');
+
+      modalImg.src = data.src;
+      modalImg.alt = data.title;
+      titleEl.textContent = data.title;
+      descEl.textContent = data.description;
+
+      document.getElementById('imageModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    // tornar disponível globalmente para os onclick inline
+    window.openTattooModal = openTattooModal;
+
+    // Carousel controls removed: designs carousel is now static thumbnails.
 
     let currentImageIndex = 0;
 
