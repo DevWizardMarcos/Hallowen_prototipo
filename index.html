@@ -98,7 +98,7 @@
       </div>
       
       <div class="shirt-models">
-        <div class="model-card" onclick="openShirtModal()">
+        <div class="model-card" onclick="openShirtModal(1)">
           <div class="model-card-inner">
             <img src="assets/blusa1.png" alt="Blusa Hallowinity Edition" class="model-image">
             <div class="model-overlay">
@@ -111,10 +111,32 @@
           <p class="model-label">🎃 <strong>Hallowinity Edition</strong></p>
           <p class="model-subtitle">Coleção Limitada 2025</p>
         </div>
-        <!-- <div class="model-card">
-          <img src="assets/blusa2.png" alt="Modelo 2 - Camisa Hallowinity" class="model-image">
-          <p class="model-label">👻 Modelo Premium</p>
-        </div> -->
+        <div class="model-card" onclick="openShirtModal(2)">
+          <div class="model-card-inner">
+            <img src="assets/blusa2.png" alt="Modelo 2 - Camisa Hallowinity" class="model-image">
+            <div class="model-overlay">
+              <div class="overlay-content">
+                <p>👁️ Ver Detalhes</p>
+                <small>Clique para ampliar</small>
+              </div>
+            </div>
+          </div>
+          <p class="model-label">👻 <strong>Modelo Premium</strong></p>
+          <p class="model-subtitle">Edição Especial 2025</p>
+        </div>
+        <div class="model-card" onclick="openShirtModal(3)">
+          <div class="model-card-inner">
+            <img src="assets/blusa3.png" alt="Modelo 3 - Camisa Hallowinity" class="model-image">
+            <div class="model-overlay">
+              <div class="overlay-content">
+                <p>👁️ Ver Detalhes</p>
+                <small>Clique para ampliar</small>
+              </div>
+            </div>
+          </div>
+          <p class="model-label">🦇 <strong>Dark Edition</strong></p>
+          <p class="model-subtitle">Coleção Exclusiva 2025</p>
+        </div>
       </div>
     </div>
 
@@ -489,23 +511,23 @@
   <div id="shirtModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🎃 Hallowinity Edition - Blusa Oficial 2025</h2>
+        <h2 id="shirtTitle">🎃 Hallowinity Edition - Blusa Oficial 2025</h2>
         <span class="close" onclick="closeShirtModal()">&times;</span>
       </div>
       
       <div class="modal-body">
         <div class="modal-image-section">
-          <img src="assets/blusa1.png" alt="Blusa Hallowinity Edition" class="modal-image">
+          <img id="shirtImage" src="assets/blusa1.png" alt="Blusa Hallowinity Edition" class="modal-image">
           <div class="image-badges">
             <span class="badge limited">🔥 EDIÇÃO LIMITADA</span>
             <span class="badge premium">✨ DESIGN PREMIUM</span>
           </div>
         </div>
-        
+
         <div class="modal-details">
           <div class="product-title">
-            <h3>🎃 Hallowinity Edition 2025</h3>
-            <p class="product-subtitle">Coleção Oficial do Evento</p>
+            <h3 id="shirtProductTitle">🎃 Hallowinity Edition 2025</h3>
+            <p class="product-subtitle" id="shirtSubtitle">Coleção Oficial do Evento</p>
           </div>
           
           <div class="features-list">

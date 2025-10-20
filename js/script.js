@@ -480,7 +480,39 @@
     });
 
     // Funções do Modal da Blusa
-    function openShirtModal() {
+    function openShirtModal(shirtNumber = 1) {
+      // Array com informações das blusas
+      const shirts = [
+        {
+          image: 'assets/blusa1.png',
+          title: '🎃 Hallowinity Edition 2025',
+          subtitle: 'Coleção Oficial do Evento',
+          description: 'Design exclusivo criado especialmente para o Hallowinity 2025'
+        },
+        {
+          image: 'assets/blusa2.png',
+          title: '👻 Modelo Premium 2025',
+          subtitle: 'Edição Especial do Evento',
+          description: 'Camisa premium com design moderno e elegante'
+        },
+        {
+          image: 'assets/blusa3.png',
+          title: '🦇 Dark Edition 2025',
+          subtitle: 'Coleção Exclusiva',
+          description: 'Design exclusivo com elementos sombrios e temáticos'
+        }
+      ];
+
+      // Validar índice (1, 2, 3 para blusa 1, 2, 3)
+      const index = Math.min(Math.max(shirtNumber - 1, 0), shirts.length - 1);
+      const shirt = shirts[index];
+
+      // Atualizar modal com a blusa selecionada
+      document.getElementById('shirtImage').src = shirt.image;
+      document.getElementById('shirtTitle').textContent = shirt.title;
+      document.getElementById('shirtProductTitle').textContent = shirt.title;
+      document.getElementById('shirtSubtitle').textContent = shirt.subtitle;
+
       document.getElementById('shirtModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
