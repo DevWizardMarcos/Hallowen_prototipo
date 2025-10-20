@@ -1,12 +1,55 @@
 
+
+    // ========================================
+    // DADOS GLOBAIS (Arrays de imagens)
+    // Declarados no topo para evitar ReferenceError
+    // ========================================
+
+    // Array com informações das imagens da galeria do concurso
+    const galleryImages = [
+      {
+        src: 'assets/concurso1.PNG',
+        title: '🏆 Vencedores do Concurso 2024',
+        description: 'Os grandes campeões do concurso de fantasia do ano passado com suas incríveis criações que conquistaram o público e os jurados.'
+      },
+      {
+        src: 'assets/concurso2.PNG',
+        title: '🎭 Fantasias Mais Criativas',
+        description: 'Uma seleção das fantasias mais originais e criativas que participaram do concurso, mostrando a diversidade e talento dos participantes.'
+      },
+      {
+        src: 'assets/concurso3.PNG',
+        title: '🎃 Melhores Momentos do Evento',
+        description: 'Registros dos momentos mais marcantes da noite, com toda a atmosfera mágica e assombrada que tornou o evento inesquecível.'
+      }
+    ];
+
+    // Array para os designs de tatuagem (mesma ordem das miniaturas no carousel)
+    // Agora cada item pode ter `src` (miniatura) e `modalSrc` (imagem grande a ser mostrada no modal)
+    const tattooDesigns = [
+      { src: 'assets/ghost.png', modalSrc: 'assets/moldalFantasma.jpg', title: '👻 Fantasma Assustador', description: 'Design clássico de Halloween com um toque moderno.' },
+      { src: 'assets/skull.png', modalSrc: 'assets/ModalCaveira.jpg', title: '💀 Caveira Sombria', description: 'A marca eterna do Halloween em sua pele.' },
+      { src: 'assets/bat.png', modalSrc: 'assets/bat.png', title: '🦇 Morcego Noturno', description: 'Símbolo da noite e do mistério.' },
+      { src: 'assets/pumpkin.png', modalSrc: 'assets/ModalAbobora.jpg', title: "🎃 Jack O'Lantern", description: 'O clássico símbolo do Halloween.' },
+      { src: 'assets/spider.png', modalSrc: 'assets/ModalGato.jpg', title: '🕷️ Gato Salem', description: 'Terror adorável.' },
+      { src: 'assets/heart.png', modalSrc: 'assets/heart.png', title: '😈 Coração Diabólico', description: 'O amor tem seu lado sombrio.' }
+    ];
+
+    // ========================================
+    // VARIÁVEL DE CONTROLE DO CARROSSEL
+    // ========================================
+    let currentTattooIndex = 0;
+
+    // ========================================
+    // FIM DOS DADOS GLOBAIS
+    // ========================================
+
     // Contador Regressivo
     function updateCountdown() {
       // Data do evento: 25 de outubro de 2025 às 17:00
       const eventDate = new Date('2025-10-25T17:00:00').getTime();
       const now = new Date().getTime();
-      const distance = eventDate - now;
-
-      if (distance < 0) {
+      const distance = eventDate - now;      if (distance < 0) {
         document.querySelector('.countdown-display').innerHTML = '<p style="color: #ff4500; font-size: 1.5rem;">🎃 O EVENTO COMEÇOU! 🎃</p>';
         return;
       }
@@ -248,7 +291,7 @@
           // Números para pessoas que querem a blusa
           const numerosBlusas = [
             '5538984096878', // (38) 8409-6878
-            '5517168043330'  // (1) 7168-4330
+            '5531987927056'  // (1) 7168-4330
           ];
           // Alternar entre os dois números para distribuir as mensagens
           const indiceNumero = Math.floor(Math.random() * numerosBlusas.length);
@@ -256,7 +299,7 @@
           console.log(`📱 Pessoa quer blusa - Usando número ${indiceNumero + 1}: ${numeroWhatsApp}`);
         } else {
           // Número padrão para inscrições sem blusa
-          numeroWhatsApp = '5571992040134'; // ⚠️ NÚMERO DE EXEMPLO - ALTERAR!
+          numeroWhatsApp = '5531987927056'; // ⚠️ NÚMERO DE EXEMPLO - ALTERAR!
           console.log(`📱 Inscrição sem blusa - Usando número padrão: ${numeroWhatsApp}`);
         }
         
@@ -269,7 +312,7 @@
         
         if (!validarNumero(numeroWhatsApp)) {
           console.error('⚠️ ERRO: Número de telefone inválido:', numeroWhatsApp);
-          console.error('Formato esperado: 55[DDD]9[8 dígitos] (Ex: 5571992040134)');
+          console.error('Formato esperado: 55[DDD]9[8 dígitos] (Ex: 5531987927056)');
           alert('ERRO TÉCNICO: Número de WhatsApp não configurado corretamente.\n\nContacte o desenvolvedor para configurar o número correto.');
           return;
         }
@@ -832,45 +875,24 @@
     // ========================================
     // MODAL DA GALERIA DE FOTOS
     // ========================================
-
-    // Array com informações das imagens
-    const galleryImages = [
-      {
-        src: 'concurso1.PNG',
-        title: '🏆 Vencedores do Concurso 2024',
-        description: 'Os grandes campeões do concurso de fantasia do ano passado com suas incríveis criações que conquistaram o público e os jurados.'
-      },
-      {
-        src: 'concurso2.PNG',
-        title: '🎭 Fantasias Mais Criativas',
-        description: 'Uma seleção das fantasias mais originais e criativas que participaram do concurso, mostrando a diversidade e talento dos participantes.'
-      },
-      {
-        src: 'concurso3.PNG',
-        title: '🎃 Melhores Momentos do Evento',
-        description: 'Registros dos momentos mais marcantes da noite, com toda a atmosfera mágica e assombrada que tornou o evento inesquecível.'
-      }
-    ];
-
-    // Array para os designs de tatuagem (mesma ordem das miniaturas no carousel)
-    const tattooDesigns = [
-      { src: 'ghost.png', title: '👻 Fantasma Assustador', description: 'Design clássico de Halloween com um toque moderno.' },
-      { src: 'skull.png', title: '💀 Caveira Sombria', description: 'A marca eterna do Halloween em sua pele.' },
-      { src: 'bat.png', title: '🦇 Morcego Noturno', description: 'Símbolo da noite e do mistério.' },
-      { src: 'pumpkin.png', title: "🎃 Jack O'Lantern", description: 'O clássico símbolo do Halloween.' },
-      { src: 'spider.png', title: '🕷️ Aranha Macabra', description: 'Terror em oito pernas.' },
-      { src: 'heart.png', title: '😈 Coração Diabólico', description: 'O amor tem seu lado sombrio.' }
-    ];
+    // (Arrays galleryImages e tattooDesigns já estão declarados no topo do arquivo)
 
     // Função para abrir modal de tatuagem usando o modal de imagem existente
     function openTattooModal(index) {
-      const data = tattooDesigns[index];
+      currentTattooIndex = index;
+      updateTattooModal();
+    }
+
+    // Função para atualizar o modal com a tatuagem atual
+    function updateTattooModal() {
+      const data = tattooDesigns[currentTattooIndex];
       if (!data) return;
       const modalImg = document.getElementById('modalImage');
       const titleEl = document.getElementById('imageTitle');
       const descEl = document.getElementById('imageDescription');
 
-      modalImg.src = data.src;
+      // Se houver `modalSrc`, usar essa imagem maior; caso contrário usar `src`
+      modalImg.src = data.modalSrc || data.src;
       modalImg.alt = data.title;
       titleEl.textContent = data.title;
       descEl.textContent = data.description;
@@ -879,8 +901,22 @@
       document.body.style.overflow = 'hidden';
     }
 
+    // Função para navegar para próxima tatuagem
+    function nextTattoo() {
+      currentTattooIndex = (currentTattooIndex + 1) % tattooDesigns.length;
+      updateTattooModal();
+    }
+
+    // Função para navegar para tatuagem anterior
+    function previousTattoo() {
+      currentTattooIndex = (currentTattooIndex - 1 + tattooDesigns.length) % tattooDesigns.length;
+      updateTattooModal();
+    }
+
     // tornar disponível globalmente para os onclick inline
     window.openTattooModal = openTattooModal;
+    window.nextTattoo = nextTattoo;
+    window.previousTattoo = previousTattoo;
 
     // Carousel controls removed: designs carousel is now static thumbnails.
 
@@ -968,10 +1004,10 @@
               closeImageModal();
               break;
             case 'ArrowLeft':
-              previousImage();
+              previousTattoo();
               break;
             case 'ArrowRight':
-              nextImage();
+              nextTattoo();
               break;
           }
         }
