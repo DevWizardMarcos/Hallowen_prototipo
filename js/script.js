@@ -69,6 +69,232 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
+    // ========================================
+    // GESTÃO DE ACOMPANHANTES
+    // ========================================
+    
+    // Função para mostrar/ocultar campos de acompanhantes
+    document.getElementById('acompanhantes').addEventListener('change', function() {
+      const numAcompanhantes = parseInt(this.value);
+      const acompanhantesDetails = document.getElementById('acompanhantesDetails');
+      const acompanhantesContainer = document.getElementById('acompanhantesContainer');
+      
+      if (numAcompanhantes > 0) {
+        acompanhantesDetails.classList.remove('hidden');
+        criarCamposAcompanhantes(numAcompanhantes);
+      } else {
+        acompanhantesDetails.classList.add('hidden');
+        acompanhantesContainer.innerHTML = '';
+      }
+    });
+
+    // Função para criar campos dinâmicos dos acompanhantes
+    function criarCamposAcompanhantes(quantidade) {
+      const container = document.getElementById('acompanhantesContainer');
+      const acompanhantesExistentes = container.querySelectorAll('.acompanhante-card').length;
+      
+      // Limpar container se a quantidade mudou
+      if (acompanhantesExistentes !== quantidade) {
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= quantidade; i++) {
+          const acompanhanteCard = document.createElement('div');
+          acompanhanteCard.className = 'acompanhante-card';
+          acompanhanteCard.innerHTML = `
+            <div class="acompanhante-header">
+              <span class="acompanhante-numero">👤 Acompanhante ${i}</span>
+            </div>
+            
+            <div class="acompanhante-form-row">
+              <div class="acompanhante-form-group">
+                <label for="acomp${i}_nome">Nome Completo *</label>
+                <input type="text" id="acomp${i}_nome" name="acomp${i}_nome" 
+                       placeholder="Nome do acompanhante" required>
+              </div>
+              
+              <div class="acompanhante-form-group">
+                <label for="acomp${i}_telefone">WhatsApp</label>
+                <input type="tel" id="acomp${i}_telefone" name="acomp${i}_telefone" 
+                       placeholder="(11) 99999-9999">
+              </div>
+            </div>
+            
+            <div class="acompanhante-form-row">
+              <div class="acompanhante-form-group">
+                <label for="acomp${i}_tipo">Você é:</label>
+                <select id="acomp${i}_tipo" name="acomp${i}_tipo" required>
+                  <option value="">Selecione uma opção</option>
+                  <option value="aluno">👨‍🎓 Aluno da Infinity School</option>
+                  <option value="visitante">👥 Visitante</option>
+                </select>
+              </div>
+              
+              <div class="acompanhante-form-group">
+                <label for="acomp${i}_idade">Faixa Etária:</label>
+                <select id="acomp${i}_idade" name="acomp${i}_idade" required>
+                  <option value="">Selecione a faixa etária</option>
+                  <option value="menor">🧒 Menor de idade (até 17 anos)</option>
+                  <option value="maior">🧑‍💼 Maior de idade (18+ anos)</option>
+                </select>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(acompanhanteCard);
+        }
+      }
+    }
+
+    // Função para validar dados dos acompanhantes
+    function validarAcompanhantes() {
+      const numAcompanhantes = parseInt(document.getElementById('acompanhantes').value);
+      
+      if (numAcompanhantes === 0) return true;
+      
+      const erros = [];
+      const nomesUtilizados = new Set();
+      const telefonesUtilizados = new Set();
+      
+      // Adicionar dados do usuário principal para verificar duplicatas
+      const nomeUsuario = document.getElementById('nome').value.trim().toLowerCase();
+      const telefoneUsuario = document.getElementById('telefone').value.trim();
+      nomesUtilizados.add(nomeUsuario);
+      if (telefoneUsuario) telefonesUtilizados.add(telefoneUsuario);
+      
+      for (let i = 1; i <= numAcompanhantes; i++) {
+        const nome = document.getElementById(`acomp${i}_nome`)?.value.trim();
+        const telefone = document.getElementById(`acomp${i}_telefone`)?.value.trim();
+        const tipo = document.getElementById(`acomp${i}_tipo`)?.value;
+        const idade = document.getElementById(`acomp${i}_idade`)?.value;
+        
+        // Validações obrigatórias
+        if (!nome) {
+          erros.push(`📝 Nome do acompanhante ${i} é obrigatório`);
+        } else {
+          // Validar formato do nome
+          if (nome.length < 2) {
+            erros.push(`📝 Nome do acompanhante ${i} deve ter pelo menos 2 caracteres`);
+          }
+          
+          // Verificar nomes duplicados
+          const nomeLowerCase = nome.toLowerCase();
+          if (nomesUtilizados.has(nomeLowerCase)) {
+            erros.push(`⚠️ Nome "${nome}" já foi utilizado. Cada pessoa deve ter um nome único`);
+          } else {
+            nomesUtilizados.add(nomeLowerCase);
+          }
+        }
+        
+        if (!tipo) {
+          erros.push(`🏫 Tipo do acompanhante ${i} (aluno/visitante) é obrigatório`);
+        }
+        
+        if (!idade) {
+          erros.push(`🎂 Faixa etária do acompanhante ${i} é obrigatória`);
+        }
+        
+        // Validar telefone se informado
+        if (telefone) {
+          // Formato básico de telefone brasileiro
+          const telefoneNumeros = telefone.replace(/\D/g, '');
+          if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+            erros.push(`📱 Telefone do acompanhante ${i} deve ter formato válido (ex: (11) 99999-9999)`);
+          }
+          
+          // Verificar duplicatas de telefone
+          if (telefonesUtilizados.has(telefone)) {
+            erros.push(`⚠️ Telefone "${telefone}" já foi utilizado. Cada pessoa deve ter um telefone único`);
+          } else {
+            telefonesUtilizados.add(telefone);
+          }
+        }
+      }
+      
+      if (erros.length > 0) {
+        alert('❌ Por favor, corrija os seguintes erros:\n\n' + erros.join('\n'));
+        return false;
+      }
+      
+      return true;
+    }
+
+    // Função para coletar dados dos acompanhantes
+    function coletarDadosAcompanhantes() {
+      const numAcompanhantes = parseInt(document.getElementById('acompanhantes').value);
+      const acompanhantes = [];
+      
+      for (let i = 1; i <= numAcompanhantes; i++) {
+        const nome = document.getElementById(`acomp${i}_nome`)?.value.trim();
+        const telefone = document.getElementById(`acomp${i}_telefone`)?.value.trim();
+        const tipo = document.getElementById(`acomp${i}_tipo`)?.value;
+        const idade = document.getElementById(`acomp${i}_idade`)?.value;
+        
+        if (nome) { // Só adiciona se tiver nome
+          acompanhantes.push({
+            nome,
+            telefone: telefone || 'Não informado',
+            tipo,
+            idade
+          });
+        }
+      }
+      
+      return acompanhantes;
+    }
+
+    // Função para validar integridade geral do formulário
+    function validarIntegridadeFormulario(formData) {
+      // Verificar se o número de acompanhantes corresponde aos dados coletados
+      const numAcompanhantesDeclarado = parseInt(formData.acompanhantes);
+      const numAcompanhantesColetados = formData.dadosAcompanhantes ? formData.dadosAcompanhantes.length : 0;
+      
+      if (numAcompanhantesDeclarado > 0 && numAcompanhantesColetados !== numAcompanhantesDeclarado) {
+        return {
+          valido: false,
+          mensagem: `Inconsistência nos dados: Você declarou ${numAcompanhantesDeclarado} acompanhante(s), mas apenas ${numAcompanhantesColetados} foram preenchidos completamente.`
+        };
+      }
+      
+      // Verificar se está tentando registrar blusa sem tamanho
+      if (formData.querCamisa) {
+        const tamanhoSelecionado = document.querySelector('input[name="tamanho"]:checked');
+        if (!tamanhoSelecionado) {
+          return {
+            valido: false,
+            mensagem: 'Você selecionou que quer a blusa, mas não escolheu o tamanho!'
+          };
+        }
+      }
+      
+      // Validar caracteres suspeitos ou maliciosos
+      const camposTexto = [formData.nome];
+      if (formData.dadosAcompanhantes) {
+        formData.dadosAcompanhantes.forEach(acomp => {
+          camposTexto.push(acomp.nome);
+        });
+      }
+      
+      const caracteresProibidos = /<script|javascript:|data:|vbscript:|onload|onerror|onclick/i;
+      for (const campo of camposTexto) {
+        if (caracteresProibidos.test(campo)) {
+          return {
+            valido: false,
+            mensagem: 'Caracteres não permitidos detectados nos dados. Por favor, use apenas texto normal.'
+          };
+        }
+      }
+      
+      // Verificar tentativa de bypass (números absurdos)
+      if (numAcompanhantesDeclarado > 5) {
+        return {
+          valido: false,
+          mensagem: 'Número de acompanhantes muito alto. Entre em contato conosco para grupos maiores que 5 pessoas.'
+        };
+      }
+      
+      return { valido: true };
+    }
+
     // Mostrar/ocultar opções de tamanho da camisa
     document.getElementById('querCamisa').addEventListener('change', function() {
       const camisaDetails = document.getElementById('camisaDetails');
@@ -82,6 +308,31 @@
         });
         // Resetar quantidade
         document.getElementById('quantidadeCamisas').value = '1';
+      }
+    });
+
+    // Formatação automática de telefone
+    function formatarTelefone(input) {
+      let valor = input.value.replace(/\D/g, '');
+      
+      if (valor.length <= 10) {
+        valor = valor.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+      } else {
+        valor = valor.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+      }
+      
+      input.value = valor;
+    }
+
+    // Aplicar formatação ao campo telefone principal
+    document.getElementById('telefone').addEventListener('input', function() {
+      formatarTelefone(this);
+    });
+
+    // Aplicar formatação aos campos de telefone dos acompanhantes (delegação de eventos)
+    document.getElementById('acompanhantesContainer').addEventListener('input', function(e) {
+      if (e.target && e.target.type === 'tel') {
+        formatarTelefone(e.target);
       }
     });
 
@@ -169,8 +420,8 @@
       
       // Coletando dados básicos do formulário
       const formData = {
-        nome: document.getElementById('nome').value,
-        telefone: document.getElementById('telefone').value,
+        nome: document.getElementById('nome').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
         acompanhantes: document.getElementById('acompanhantes').value,
         tipoParticipante: document.getElementById('tipo-participante').value,
         faixaEtaria: document.getElementById('faixa-etaria').value,
@@ -178,9 +429,45 @@
         participarConcurso: document.getElementById('participarConcurso').checked
       };
 
+      // Validações básicas de segurança
+      const errosBasicos = [];
+      
+      if (!formData.nome || formData.nome.length < 2) {
+        errosBasicos.push('📝 Nome deve ter pelo menos 2 caracteres');
+      }
+      
+      if (!formData.telefone) {
+        errosBasicos.push('📱 WhatsApp é obrigatório');
+      } else {
+        const telefoneNumeros = formData.telefone.replace(/\D/g, '');
+        if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+          errosBasicos.push('📱 WhatsApp deve ter formato válido (ex: (11) 99999-9999)');
+        }
+      }
+      
+      if (errosBasicos.length > 0) {
+        alert('❌ Por favor, corrija os erros básicos:\n\n' + errosBasicos.join('\n'));
+        return;
+      }
+
       // Validar campos obrigatórios de elegibilidade
       if (!formData.tipoParticipante || !formData.faixaEtaria) {
         alert('Por favor, preencha se você é aluno ou visitante e sua faixa etária!');
+        return;
+      }
+
+      // Validar dados dos acompanhantes
+      if (!validarAcompanhantes()) {
+        return;
+      }
+
+      // Coletar dados dos acompanhantes
+      formData.dadosAcompanhantes = coletarDadosAcompanhantes();
+
+      // Validação anti-spam e integridade dos dados
+      const validacaoIntegridade = validarIntegridadeFormulario(formData);
+      if (!validacaoIntegridade.valido) {
+        alert('⚠️ ' + validacaoIntegridade.mensagem);
         return;
       }
 
@@ -225,6 +512,19 @@
         mensagem += `👤 *Nome:* ${formData.nome}\n`;
         mensagem += `📱 *WhatsApp:* ${formData.telefone}\n`;
         mensagem += `👥 *Acompanhantes:* ${formData.acompanhantes}\n\n`;
+        
+        // Dados dos acompanhantes (se houver)
+        if (formData.dadosAcompanhantes && formData.dadosAcompanhantes.length > 0) {
+          mensagem += `👥 *DADOS DOS ACOMPANHANTES:*\n`;
+          formData.dadosAcompanhantes.forEach((acomp, index) => {
+            mensagem += `\n🧑‍🤝‍🧑 *Acompanhante ${index + 1}:*\n`;
+            mensagem += `   • Nome: ${acomp.nome}\n`;
+            mensagem += `   • WhatsApp: ${acomp.telefone}\n`;
+            mensagem += `   • Tipo: ${acomp.tipo === 'aluno' ? '👨‍🎓 Aluno da Infinity School' : '👥 Visitante'}\n`;
+            mensagem += `   • Idade: ${acomp.idade === 'menor' ? '🧒 Menor de idade' : '🧑‍💼 Maior de idade'}\n`;
+          });
+          mensagem += `\n`;
+        }
         
         // Informações de elegibilidade
         mensagem += `🏫 *Você é:* ${formData.tipoParticipante === 'aluno' ? '👨‍🎓 Aluno da Infinity School' : '👥 Visitante'}\n`;

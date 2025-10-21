@@ -165,9 +165,31 @@
           <select id="acompanhantes" name="acompanhantes">
             <option value="0">Vou sozinho(a)</option>
             <option value="1">1 acompanhante</option>
-            
-        
+      
           </select>
+          <small style="color: #999; font-size: 0.8rem; display: block; margin-top: 5px;">
+            💡 Para grupos maiores que 5 pessoas, entre em contato conosco diretamente
+          </small>
+        </div>
+
+        <!-- Seção de Dados dos Acompanhantes (inicialmente oculta) -->
+        <div id="acompanhantesDetails" class="form-group hidden">
+          <div class="acompanhantes-section">
+            <h3 style="color: #ff6600; margin-bottom: 15px;">👥 Dados dos Acompanhantes</h3>
+            <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">
+              Para facilitar a organização do evento, precisamos dos dados básicos de seus acompanhantes:
+            </p>
+            <div style="background: rgba(255, 102, 0, 0.1); border-left: 3px solid #ff6600; padding: 10px 15px; margin-bottom: 15px; border-radius: 5px;">
+              <p style="color: #ff6600; font-size: 0.85rem; margin: 0;">
+                ⚠️ <strong>Importante:</strong> Todos os acompanhantes devem ter nome e informações completas para participar do evento.
+                O telefone é opcional, mas recomendado para contato de emergência.
+              </p>
+            </div>
+            
+            <div id="acompanhantesContainer">
+              <!-- Os campos dos acompanhantes serão inseridos aqui dinamicamente pelo JavaScript -->
+            </div>
+          </div>
         </div>
         
         <div class="form-group">
